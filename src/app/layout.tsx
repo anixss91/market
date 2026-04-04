@@ -1,10 +1,3 @@
-import './globals.css'
-
-export const metadata = {
-  title: 'My Store',
-  description: 'Online Store',
-}
-
 export default function RootLayout({
   children,
 }: {
