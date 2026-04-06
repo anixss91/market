@@ -1,4 +1,6 @@
 import './globals.css'
+import { AuthProvider } from '@/components/AuthContext'
+import { CartProvider } from '@/components/CartContext'
 
 export const metadata = {
   title: 'My Store',
@@ -12,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <CartProvider>{children}</CartProvider>
+        </AuthProvider>
+      </body>
     </html>
   )
 }

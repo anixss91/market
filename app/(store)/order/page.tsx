@@ -22,6 +22,7 @@ function OrderForm() {
   const productId = searchParams.get('productId')
   const [product, setProduct] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -29,6 +30,18 @@ function OrderForm() {
     city: '',
     deliveryMethod: 'Home Delivery'
   })
+
+  useEffect(() => {
+    const savedUser = window.localStorage.getItem('my-store-user')
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser)
+        setCurrentUserId(parsed?.id ?? null)
+      } catch {
+        setCurrentUserId(null)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (productId) {
@@ -46,7 +59,7 @@ function OrderForm() {
     await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, productId: parseInt(productId!) })
+      body: JSON.stringify({ ...form, productId: parseInt(productId!), userId: currentUserId })
     })
     setSubmitted(true)
   }

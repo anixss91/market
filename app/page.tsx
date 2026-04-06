@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import ProductCard from '@/components/ProductCard'
+import ProductSearchFilters from '@/components/ProductSearchFilters'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,15 +22,19 @@ export default async function Home() {
         .navbar {
           position: sticky;
           top: 0;
+          left: 0;
+          right: 0;
           z-index: 100;
-          background: rgba(248, 247, 244, 0.92);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(0,0,0,0.07);
+          background: rgba(248, 247, 244, 0.96);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(0,0,0,0.08);
           padding: 0 2.5rem;
           height: 68px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 0.75rem;
         }
 
         .nav-logo {
@@ -66,8 +70,24 @@ export default async function Home() {
         .nav-links {
           display: flex;
           align-items: center;
-          gap: 2rem;
+          gap: 1.2rem;
           list-style: none;
+          flex-wrap: wrap;
+        }
+
+        .nav-links a {
+          text-decoration: none;
+          color: #555;
+          font-size: 0.95rem;
+          font-weight: 400;
+          transition: color 0.2s;
+          padding: 0.4rem 0.2rem;
+        }
+
+        .nav-links a:hover { color: #1a1a1a; }
+
+        .nav-dropdown {
+          position: relative;
         }
 
         .nav-links a {
@@ -79,6 +99,41 @@ export default async function Home() {
         }
 
         .nav-links a:hover { color: #1a1a1a; }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          min-width: 180px;
+          background: #fff;
+          border-radius: 14px;
+          box-shadow: 0 18px 30px rgba(0, 0, 0, 0.08);
+          padding: 0.5rem 0;
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(10px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          z-index: 15;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+          opacity: 1;
+          pointer-events: auto;
+          transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+          display: block;
+          padding: 0.75rem 1rem;
+          color: #333;
+          white-space: nowrap;
+          transition: background 0.2s, color 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+          background: rgba(0, 0, 0, 0.04);
+          color: #1a1a1a;
+        }
 
         .nav-cta {
           background: #1a1a1a;
@@ -236,11 +291,28 @@ export default async function Home() {
           font-size: 0.85rem;
         }
 
-        @media (max-width: 640px) {
-          .navbar { padding: 0 1.25rem; }
-          .nav-links { display: none; }
+        @media (max-width: 768px) {
+          .navbar { padding: 0 1rem; }
+          .nav-links {
+            width: 100%;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+          }
           .hero { padding: 3rem 1.25rem 2rem; }
           .products-section { padding: 2rem 1.25rem 3rem; }
+          .section-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        }
+
+        @media (max-width: 520px) {
+          .navbar { padding: 0 0.85rem; }
+          .nav-links { justify-content: center; gap: 0.5rem; }
+          .hero { padding: 2.5rem 0.85rem 1.75rem; }
+          .hero h1 { font-size: 2.5rem; }
+          .btn-primary, .btn-secondary { width: 100%; text-align: center; }
+          .products-section { padding: 1.5rem 0.85rem 2rem; }
+          .products-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -250,8 +322,20 @@ export default async function Home() {
           <span className="logo-name">MyMarket</span>
         </a>
         <ul className="nav-links">
+          <li className="nav-dropdown">
+            <a href="/categories">Categories</a>
+            <div className="dropdown-menu">
+              <a href="/categories/men">Men's Clothing</a>
+              <a href="/categories/women">Women's Clothing</a>
+              <a href="/categories/kids">Kids Clothing</a>
+            </div>
+          </li>
+          <li><a href="/auth/login">Login</a></li>
+          <li><a href="/auth/signup">Signup</a></li>
+          <li><a href="/account">My Account</a></li>
           <li><a href="/">Home</a></li>
           <li><a href="/#products">Products</a></li>
+          <li><a href="/cart">Cart</a></li>
           <li><a href="/login" className="nav-cta">Admin</a></li>
         </ul>
       </nav>
@@ -273,17 +357,7 @@ export default async function Home() {
           <h2 className="section-title">All Products</h2>
           <span className="section-count">{products.length} items</span>
         </div>
-        <div className="products-grid">
-          {products.length === 0 && (
-            <div className="empty-state">
-              <h3>No products yet</h3>
-              <p>Check back soon!</p>
-            </div>
-          )}
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductSearchFilters products={products} />
       </section>
 
       <footer className="footer">
